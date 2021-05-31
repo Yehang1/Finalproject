@@ -4,14 +4,26 @@ import tkinter.messagebox as tkMessageBox
 import sqlite3
 
 
+
+def Database():
+    global conn, cursor
+    #creating student database
+    conn = sqlite3.connect("stu.db")
+    cursor = conn.cursor()
+    #creating STUD_REGISTRATION table
+    cursor.execute(
+        "CREATE TABLE IF NOT EXISTS STU_DATA (STU_ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, STU_NAME TEXT, STU_CONTACT TEXT, STU_EMAIL TEXT, STU_ROLLNO TEXT, STU_BRANCH TEXT)")
+
+
+
 #defining function for creating GUI Layout
-def DisplayForm():
+def Main_frame():
     #creating window
-    display_screen = Tk()
+    root = Tk()
     #setting width and height for window
-    display_screen.geometry("1000x800")
+    root.geometry("1000x800")
     #setting title for window
-    display_screen.title("Studentdatabase")
+    root.title("Studentdatabase")
     global tree
     global SEARCH
     global name,contact,email,rollno,branch
@@ -23,20 +35,20 @@ def DisplayForm():
     branch = StringVar()
     #creating frames for layout
     #topview frame for heading
-    TopViewForm = Frame(display_screen, width=900, bd=4, relief=GROOVE)
-    TopViewForm.pack(side=TOP, fill=X)
+    title_frame = Frame(root, width=900, bd=4, relief=GROOVE)
+    title_frame.pack(side=TOP, fill=X)
     #first left frame for registration from
 
     #seconf left frame for search form
-    LeftViewForm = Frame(display_screen, width=900,bg="gray")
-    LeftViewForm.pack(side=BOTTOM, fill=Y)
-    LFrom = Frame(display_screen, width="800")
+    search_frame = Frame(root, width=900,bg="gray")
+    search_frame.pack(side=BOTTOM, fill=Y)
+    LFrom = Frame(root, width="800")
     LFrom.pack(side=RIGHT, fill=Y)
     #mid frame for displaying students record
-    MidViewForm = Frame(display_screen, width=1500,height=700)
-    MidViewForm.pack(side=RIGHT)
+    display_frame = Frame(root, width=1500,height=700)
+    display_frame.pack(side=RIGHT)
     #label for heading
-    lbl_text = Label(TopViewForm, text="Student Management System", font=('verdana', 18), width=600,bg="#1C2833",fg="white")
+    lbl_text = Label(title_frame, text="Student Management System", font=('verdana', 18), width=600,bg="thistle1")
     lbl_text.pack(fill=X)
     #creating registration form in first left frame
     Label(LFrom, text="Name  ", font=("Arial", 12)).pack(side=TOP)
@@ -50,3 +62,59 @@ def DisplayForm():
     Label(LFrom, text="Branch ", font=("Arial", 12)).pack(side=TOP)
     Entry(LFrom, font=("Arial", 10, "bold"),textvariable=branch).pack(side=TOP, padx=10, fill=X)
     Button(LFrom,text="Submit",font=("Arial", 10, "bold"),command=register).pack(side=TOP, padx=10,pady=5, fill=X)
+
+    # creating search label and entry in second frame
+    lbl_txtsearch = Label(search_frame, text="Enter name to Search", font=('verdana', 10), bg="gray")
+    lbl_txtsearch.pack()
+    # creating search entry
+    search = Entry(search_frame, textvariable=SEARCH, font=('verdana', 15), width=10)
+    search.pack(side=LEFT, padx=10, fill=X)
+    # creating search button
+    btn_search = Button(search_frame, text="Search", command=SearchRecord)
+    btn_search.pack(side=LEFT, padx=10, pady=10, fill=X)
+    # creating view button
+    btn_view = Button(search_frame, text="View All", command=DisplayData)
+    btn_view.pack(side=LEFT, padx=10, pady=10, fill=X)
+    # creating reset button
+    btn_reset = Button(search_frame, text="Reset", command=Reset)
+    btn_reset.pack(side=LEFT, padx=10, pady=10, fill=X)
+    # creating delete button
+    btn_delete = Button(search_frame, text="Delete", command=delete)
+    btn_delete.pack(side=LEFT, padx=10, pady=10, fill=X)
+    # setting scrollbar
+    scrollbarx = Scrollbar(display_frame, orient=HORIZONTAL)
+    scrollbary = Scrollbar(display_frame, orient=VERTICAL)
+    tree = ttk.Treeview(display_frame, columns=("Student Id", "Name", "Contact", "Email", "Rollno", "Branch"),
+                        selectmode="extended", height=100, yscrollcommand=scrollbary.set, xscrollcommand=scrollbarx.set)
+    scrollbary.config(command=tree.yview)
+    scrollbary.pack(side=RIGHT, fill=Y)
+    scrollbarx.config(command=tree.xview)
+    scrollbarx.pack(side=BOTTOM, fill=X)
+    # setting headings for the columns
+    tree.heading('Student Id', text="Student Id", anchor=W)
+    tree.heading('Name', text="Name", anchor=W)
+    tree.heading('Contact', text="Contact", anchor=W)
+    tree.heading('Email', text="Email", anchor=W)
+    tree.heading('Rollno', text="Rollno", anchor=W)
+    tree.heading('Branch', text="Branch", anchor=W)
+    # setting width of the columns
+    tree.column('#0', stretch=NO, minwidth=0, width=0)
+    tree.column('#1', stretch=NO, minwidth=0, width=100)
+    tree.column('#2', stretch=NO, minwidth=0, width=150)
+    tree.column('#3', stretch=NO, minwidth=0, width=80)
+    tree.column('#4', stretch=NO, minwidth=0, width=120)
+    tree.pack()
+    DisplayData()
+
+
+
+
+
+Main_frame()
+if __name__=='__main__':
+#Running Application
+ mainloop()
+
+
+
+
